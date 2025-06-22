@@ -1,25 +1,118 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ProjectProvider } from './contexts/ProjectContext';
+import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
+import { Dashboard } from './pages/Dashboard'; 
+import { Editor } from './pages/Editor';
+import { Settings } from './pages/Settings';
+import { Templates } from './pages/Templates';
+import { AllProjects } from './pages/AllProjects';
+
+// Protected Route component
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return user ? <>{children}</> : <Navigate to="/login" replace />;
+};
+
+// Public Route component (redirect to dashboard if already logged in)
+const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return user ? <Navigate to="/dashboard" replace /> : <>{children}</>;
+};
+
+const AppRoutes: React.FC = () => {
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/login" element={
+        <PublicRoute>
+          <Login />
+        </PublicRoute>
+      } />
+      <Route path="/signup" element={
+        <PublicRoute>
+          <Signup />
+        </PublicRoute>
+      } />
+
+      {/* Protected Routes */}
+      <Route path="/" element={
+        <ProtectedRoute>
+          <Navigate to="/dashboard" replace />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/dashboard" element={
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/editor/:id" element={
+        <ProtectedRoute>
+          <Editor />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/settings" element={
+        <ProtectedRoute>
+          <Settings />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/templates" element={
+        <ProtectedRoute>
+          <Templates />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/projects" element={
+        <ProtectedRoute>
+          <AllProjects />
+        </ProtectedRoute>
+      } />
+
+      {/* Catch all route */}
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
+  );
+};
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <AuthProvider>
+        <ProjectProvider>
+          <AppRoutes />
+        </ProjectProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
