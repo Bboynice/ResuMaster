@@ -1,7 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProjectProvider } from './contexts/ProjectContext';
+import { SidebarProvider, useSidebar } from './contexts/SidebarContext';
+import { Sidebar } from './components/Layout/Sidebar';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { Dashboard } from './pages/Dashboard'; 
@@ -9,6 +11,28 @@ import { Editor } from './pages/Editor';
 import { Settings } from './pages/Settings';
 import { Templates } from './pages/Templates';
 import { AllProjects } from './pages/AllProjects';
+
+// App Wrapper with Sidebar - manages sidebar at app level using context
+const AppWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isOpen, isMobile, toggleSidebar } = useSidebar();
+  const location = useLocation();
+
+  // Check if current route should show sidebar (exclude login/signup)
+  const showSidebar = !location.pathname.includes('/login') && !location.pathname.includes('/signup');
+
+  return (
+    <>
+      {showSidebar && (
+        <Sidebar 
+          isOpen={isOpen} 
+          onToggle={toggleSidebar} 
+          isMobile={isMobile}
+        />
+      )}
+      {children}
+    </>
+  );
+};
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -48,6 +72,7 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 const AppRoutes: React.FC = () => {
   return (
+    <AppWrapper>
     <Routes>
       {/* Public Routes */}
       <Route path="/login" element={
@@ -101,6 +126,7 @@ const AppRoutes: React.FC = () => {
       {/* Catch all route */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
+    </AppWrapper>
   );
 };
 
@@ -109,7 +135,9 @@ function App() {
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <ProjectProvider>
+          <SidebarProvider>
           <AppRoutes />
+          </SidebarProvider>
         </ProjectProvider>
       </AuthProvider>
     </Router>

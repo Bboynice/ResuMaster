@@ -9,7 +9,12 @@
   }
   
   body {
-    @apply bg-white text-neutral-900 antialiased;
+    @apply bg-white text-neutral-900 antialiased transition-colors duration-300;
+  }
+  
+  /* Dark mode styles */
+  .dark body {
+    @apply bg-neutral-900 text-neutral-100;
   }
 }
 
@@ -18,8 +23,16 @@
     @apply bg-neutral-900 hover:bg-neutral-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98];
   }
   
+  .dark .btn-primary {
+    @apply bg-emerald-600 hover:bg-emerald-700;
+  }
+  
   .btn-secondary {
     @apply bg-neutral-100 hover:bg-neutral-200 text-neutral-900 font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98];
+  }
+  
+  .dark .btn-secondary {
+    @apply bg-neutral-800 hover:bg-neutral-700 text-neutral-100;
   }
   
   .btn-ai {
@@ -54,24 +67,48 @@
     @apply bg-white rounded-2xl shadow-sm border border-neutral-200/50 transition-all duration-300 hover:shadow-lg hover:shadow-neutral-900/5 hover:border-neutral-300/50 backdrop-blur-sm;
   }
   
+  .dark .card {
+    @apply bg-neutral-800/90 border-neutral-700/50 hover:shadow-neutral-900/20 hover:border-neutral-600/50;
+  }
+  
   .card-elevated {
     @apply bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-neutral-200/30 transition-all duration-500 hover:shadow-2xl hover:shadow-neutral-900/10 hover:border-neutral-300/40;
+  }
+  
+  .dark .card-elevated {
+    @apply bg-neutral-800/80 border-neutral-700/30 hover:shadow-neutral-900/30 hover:border-neutral-600/40;
   }
   
   .input-field {
     @apply w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-neutral-400 transition-all duration-300 bg-white/50 backdrop-blur-sm placeholder:text-neutral-400;
   }
   
+  .dark .input-field {
+    @apply border-neutral-700 bg-neutral-800/50 text-neutral-100 placeholder:text-neutral-500 focus:ring-emerald-500/20 focus:border-emerald-500;
+  }
+  
   .sidebar-nav-item {
     @apply flex items-center gap-3 px-4 py-3 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/80 rounded-xl transition-all duration-300 font-medium backdrop-blur-sm;
+  }
+  
+  .dark .sidebar-nav-item {
+    @apply text-neutral-400 hover:text-neutral-100 hover:bg-neutral-700/50;
   }
   
   .sidebar-nav-item.active {
     @apply text-neutral-900 bg-neutral-900/5 hover:bg-neutral-900/10 shadow-sm;
   }
   
+  .dark .sidebar-nav-item.active {
+    @apply text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20;
+  }
+  
   .glass-effect {
     @apply bg-white/70 backdrop-blur-xl border border-white/20 shadow-lg;
+  }
+  
+  .dark .glass-effect {
+    @apply bg-neutral-900/70 border-neutral-700/20;
   }
   
   .gradient-text {

@@ -20,7 +20,7 @@ export const Header: React.FC = () => {
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -50, opacity: 0 }}
-          className="bg-gradient-to-r from-purple-600 via-pink-500 to-purple-700 text-white px-6 py-4 text-center relative overflow-hidden"
+          className="bg-gradient-to-r from-purple-600 via-pink-500 to-purple-700 text-white px-6 py-4 text-center relative overflow-hidden z-10"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-pink-500/20 to-purple-700/20 animate-shimmer"></div>
           <p className="text-sm font-bold relative z-10">
@@ -36,7 +36,7 @@ export const Header: React.FC = () => {
         </motion.div>
       )}
       
-      <motion.header 
+      {/* <motion.header 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -59,7 +59,7 @@ export const Header: React.FC = () => {
             </motion.div>
           </div>
         </div>
-      </motion.header>
+      </motion.header> */}
     </>
   );
 }; 

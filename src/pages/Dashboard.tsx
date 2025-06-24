@@ -37,6 +37,8 @@ export const Dashboard: React.FC = () => {
 
   return (
     <AppLayout>
+      <>
+      </>
       <div className="space-y-8">
         {/* Header */}
         <motion.div
@@ -147,13 +149,7 @@ export const Dashboard: React.FC = () => {
                 <p className="text-neutral-600 mb-8 max-w-md mx-auto text-lg">
                   Get started by creating your first <span className="gradient-text font-bold">resume</span> or <span className="gradient-text font-bold">cover letter</span> project.
                 </p>
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="btn-primary gap-3 group"
-                >
-                  <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
-                  <span className="font-bold">Create Your First Project</span>
-                </button>
+               
               </CardContent>
             </Card>
           ) : (
@@ -192,7 +188,7 @@ export const Dashboard: React.FC = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="btn-primary h-24 lg:h-28 flex-col gap-3 text-left justify-center items-center group"
+                  className="btn-primary h-24 lg:h-28 flex-col gap-3 text-left justify-center flex items-center group"
                 >
                   <div className="flex items-center gap-3 text-lg font-bold">
                     <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
@@ -202,7 +198,7 @@ export const Dashboard: React.FC = () => {
                 </button>
                 
                 <button
-                  className="btn-secondary h-24 lg:h-28 flex-col gap-3 text-left justify-center items-center group hover:scale-[1.02] transition-all duration-300"
+                  className="btn-secondary h-24 lg:h-28 flex-col gap-3 text-left flex justify-center items-center group hover:scale-[1.02] transition-all duration-300"
                   onClick={() => window.location.href = '/templates'}
                 >
                   <div className="flex items-center gap-3 text-lg font-bold text-neutral-900">

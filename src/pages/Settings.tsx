@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { User, Save, AlertCircle, CheckCircle, Zap } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
+import { User, Save, AlertCircle, CheckCircle, Zap, Moon, Sun, Monitor } from 'lucide-react';
 import { testOpenAIConnection, isOpenAIConfigured } from '../services/openai';
 import { AppLayout } from '../components/Layout/AppLayout';
 
 export const Settings: React.FC = () => {
   const { user, updateProfile, refreshDemoUser } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [email, setEmail] = useState(user?.email || '');
   const [loading, setLoading] = useState(false);
@@ -86,8 +88,8 @@ export const Settings: React.FC = () => {
     <AppLayout>
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Settings</h1>
-          <p className="text-slate-600">Manage your account settings and preferences.</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">Settings</h1>
+          <p className="text-slate-600 dark:text-slate-400">Manage your account settings and preferences.</p>
         </div>
 
         {isDemoMode && (
@@ -217,15 +219,105 @@ export const Settings: React.FC = () => {
           </form>
         </div>
 
+        {/* Theme Settings */}
+        <div className="card p-8 mt-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+              {theme === 'dark' ? (
+                <Moon size={24} className="text-purple-600 dark:text-purple-400" />
+              ) : (
+                <Sun size={24} className="text-purple-600 dark:text-purple-400" />
+              )}
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Theme Settings</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Choose your preferred theme appearance.</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <button
+                onClick={() => setTheme('light')}
+                className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+                  theme === 'light'
+                    ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
+                    : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'
+                }`}
+              >
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 bg-white rounded-lg border border-neutral-200 flex items-center justify-center shadow-sm">
+                    <Sun size={24} className="text-yellow-500" />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">Light</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Clean and bright</p>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setTheme('dark')}
+                className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+                  theme === 'dark'
+                    ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
+                    : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'
+                }`}
+              >
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 bg-neutral-800 rounded-lg flex items-center justify-center shadow-sm">
+                    <Moon size={24} className="text-blue-400" />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">Dark</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Easy on the eyes</p>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  setTheme(systemTheme);
+                }}
+                className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+                  !['light', 'dark'].includes(theme)
+                    ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
+                    : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'
+                }`}
+              >
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-neutral-100 to-neutral-800 rounded-lg flex items-center justify-center shadow-sm">
+                    <Monitor size={24} className="text-neutral-600" />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">System</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Follow system</p>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                <strong>Current theme:</strong> {theme === 'light' ? 'Light Mode' : 'Dark Mode'}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                Theme preference is saved automatically and will persist across sessions.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* AI Configuration */}
         <div className="card p-8 mt-8">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-              <Zap size={24} className="text-purple-600" />
+            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+              <Zap size={24} className="text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">AI Features</h2>
-              <p className="text-sm text-gray-600">Configure and test your AI functionality.</p>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">AI Features</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Configure and test your AI functionality.</p>
             </div>
           </div>
 

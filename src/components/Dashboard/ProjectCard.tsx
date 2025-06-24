@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { FileText, Mail, Edit3, Trash2, Calendar, Edit2 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -138,12 +139,12 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
       </Card>
 
       {/* Rename Modal */}
-      {showRenameModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      {showRenameModal && createPortal(
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[50000] p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl p-4 lg:p-6 w-full max-w-md"
+            className="bg-white rounded-xl p-4 lg:p-6 w-full max-w-md relative z-[50000]"
           >
             <h3 className="text-lg font-semibold text-slate-900 mb-4">
               Rename Project
@@ -190,16 +191,17 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
               </Button>
             </div>
           </motion.div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      {showDeleteModal && createPortal(
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[50000] p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl p-4 lg:p-6 w-full max-w-md"
+            className="bg-white rounded-xl p-4 lg:p-6 w-full max-w-md relative z-[50000]"
           >
             <h3 className="text-lg font-semibold text-slate-900 mb-4">
               Delete Project
@@ -226,7 +228,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
               </Button>
             </div>
           </motion.div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

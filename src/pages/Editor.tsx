@@ -10,7 +10,24 @@ import {
   Eye,
   EyeOff 
 } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from '@dnd-kit/core';
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import { EditableSection } from '../components/Editor/EditableSection';
+import { SectionDropZone } from '../components/Editor/SectionDropZone';
 import { AppLayout } from '../components/Layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -27,7 +44,16 @@ export const Editor: React.FC = () => {
   const [aiPrompt, setAiPrompt] = useState('');
   const [showAiModal, setShowAiModal] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Check screen size for responsive behavior
   React.useEffect(() => {
@@ -79,7 +105,43 @@ export const Editor: React.FC = () => {
   };
 
   const handleSectionDelete = async (sectionId: string) => {
-    const updatedLayout = currentProject.layout.filter(section => section.id !== sectionId);
+    const sectionToDelete = currentProject.layout.find(s => s.id === sectionId);
+    let updatedLayout = currentProject.layout.filter(section => section.id !== sectionId);
+    
+    // If the deleted section was part of a multi-column row, check if we need to reset remaining sections
+    if (sectionToDelete && sectionToDelete.row !== undefined && sectionToDelete.column !== undefined) {
+      const rowNumber = sectionToDelete.row;
+      const remainingSectionsInRow = updatedLayout.filter(s => s.row === rowNumber);
+      
+      if (remainingSectionsInRow.length === 1) {
+        // Only one section left in the row, reset it to full width
+        updatedLayout = updatedLayout.map(section => {
+          if (section.row === rowNumber) {
+            return {
+              ...section,
+              row: undefined,
+              column: undefined,
+              columnsInRow: undefined
+            };
+          }
+          return section;
+        });
+      } else if (remainingSectionsInRow.length > 1) {
+        // Multiple sections remain, update their column properties
+        const sortedRemaining = remainingSectionsInRow.sort((a, b) => (a.column ?? 0) - (b.column ?? 0));
+        updatedLayout = updatedLayout.map(section => {
+          if (section.row === rowNumber) {
+            const newColumnIndex = sortedRemaining.findIndex(s => s.id === section.id);
+            return {
+              ...section,
+              column: newColumnIndex,
+              columnsInRow: remainingSectionsInRow.length
+            };
+          }
+          return section;
+        });
+      }
+    }
     
     try {
       await updateLayout(updatedLayout);
@@ -89,22 +151,107 @@ export const Editor: React.FC = () => {
     }
   };
 
-  const handleAddSection = async () => {
+  const handleAddSection = async (position?: number, direction?: 'vertical' | 'left' | 'right', sectionId?: string) => {
     const newSection: LayoutSection = {
       id: `section-${Date.now()}`,
       type: 'section',
       title: 'New Section',
       content: 'Add your content here...',
-      order: currentProject.layout.length
+      order: position !== undefined ? position : currentProject.layout.length
     };
 
-    const updatedLayout = [...currentProject.layout, newSection];
+    let updatedLayout: LayoutSection[];
+    
+    if (direction === 'left' || direction === 'right') {
+      // Horizontal split: convert existing section to multi-column layout
+      const existingSection = currentProject.layout.find(s => s.id === sectionId);
+      if (!existingSection) return;
+      
+      // Determine row number for the existing section
+      const rowNumber = existingSection.row ?? existingSection.order;
+      
+      // Update existing section to be in a column
+      const updatedExistingSection: LayoutSection = {
+        ...existingSection,
+        row: rowNumber,
+        column: direction === 'left' ? 1 : 0, // If adding to left, existing goes to right (1)
+        columnsInRow: 2
+      };
+      
+      // Create new section in the other column
+      const newColumnSection: LayoutSection = {
+        ...newSection,
+        row: rowNumber,
+        column: direction === 'left' ? 0 : 1, // If adding to left, new goes to left (0)
+        columnsInRow: 2
+      };
+      
+      // Update layout
+      updatedLayout = currentProject.layout.map(section => 
+        section.id === sectionId ? updatedExistingSection : section
+      );
+      updatedLayout.push(newColumnSection);
+      
+    } else {
+      // Vertical add (existing functionality)
+      if (position !== undefined) {
+        // Insert at specific position and reorder
+        const sortedLayout = [...currentProject.layout].sort((a, b) => a.order - b.order);
+        sortedLayout.splice(position, 0, newSection);
+        updatedLayout = sortedLayout.map((section, index) => ({
+          ...section,
+          order: index
+        }));
+      } else {
+        // Add at the end
+        updatedLayout = [...currentProject.layout, newSection];
+      }
+    }
     
     try {
       await updateLayout(updatedLayout);
     } catch (error) {
       console.error('Error adding section:', error);
       alert('Failed to add section. Please try again.');
+    }
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (active.id !== over?.id && over?.id) {
+      const sortedLayout = [...currentProject.layout].sort((a, b) => a.order - b.order);
+      const oldIndex = sortedLayout.findIndex(section => section.id === active.id);
+      const newIndex = sortedLayout.findIndex(section => section.id === over?.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        // Immediately update the local state to prevent visual jumping
+        const newLayout = arrayMove(sortedLayout, oldIndex, newIndex);
+        const updatedLayout = newLayout.map((section, index) => ({
+          ...section,
+          order: index
+        }));
+
+        // Update local state immediately
+        setCurrentProject(currentProject ? { ...currentProject, layout: updatedLayout } : null);
+
+        // Then save to backend with a small delay to ensure smooth UI
+        setTimeout(async () => {
+          try {
+            await updateLayout(updatedLayout);
+          } catch (error) {
+            console.error('Error reordering sections:', error);
+            // Revert local state on error
+            setCurrentProject(currentProject);
+            alert('Failed to reorder sections. Please try again.');
+          }
+        }, 100);
+      }
     }
   };
 
@@ -170,6 +317,198 @@ export const Editor: React.FC = () => {
 
   const sortedLayout = [...currentProject.layout].sort((a, b) => a.order - b.order);
 
+  // Organize sections into rows for multi-column layout
+  const organizeIntoRows = (sections: LayoutSection[]) => {
+    const rows: { [key: number]: LayoutSection[] } = {};
+    
+    sections.forEach(section => {
+      const rowNumber = section.row ?? section.order;
+      if (!rows[rowNumber]) {
+        rows[rowNumber] = [];
+      }
+      rows[rowNumber].push(section);
+    });
+    
+    // Sort sections within each row by column
+    Object.keys(rows).forEach(rowKey => {
+      rows[parseInt(rowKey)].sort((a, b) => (a.column ?? 0) - (b.column ?? 0));
+    });
+    
+    return rows;
+  };
+
+  const renderSectionRow = (sections: LayoutSection[], rowIndex: number) => {
+    if (sections.length === 1 && sections[0].column === undefined) {
+      // Single section, full width
+      return (
+        <React.Fragment key={sections[0].id}>
+          <EditableSection
+            section={sections[0]}
+            onUpdate={handleSectionUpdate}
+            onDelete={handleSectionDelete}
+            onAddSection={handleAddSection}
+          />
+          <SectionDropZone 
+            position={rowIndex + 1} 
+            onAddSection={handleAddSection}
+          />
+        </React.Fragment>
+      );
+    }
+    
+    // Multi-column row
+    const columnsInRow = sections[0]?.columnsInRow || sections.length;
+    const columnWidth = `${100 / columnsInRow}%`;
+    
+    return (
+      <React.Fragment key={`row-${rowIndex}`}>
+        <div className="flex gap-4 w-full">
+          {sections.map((section) => (
+            <EditableSection
+              key={section.id}
+              section={section}
+              onUpdate={handleSectionUpdate}
+              onDelete={handleSectionDelete}
+              onAddSection={handleAddSection}
+              columnWidth={columnWidth}
+            />
+          ))}
+        </div>
+        <SectionDropZone 
+          position={rowIndex + 1} 
+          onAddSection={handleAddSection}
+        />
+      </React.Fragment>
+    );
+  };
+
+  const organizedRows = organizeIntoRows(sortedLayout);
+
+  const renderPreviewRow = (sections: LayoutSection[]) => {
+    if (sections.length === 1 && sections[0].column === undefined) {
+      // Single section, full width
+      const section = sections[0];
+      return (
+        <div key={section.id} className="resume-section">
+          {section.type === 'header' && (
+            <div className="resume-header">
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">
+                {section.title || 'Your Name'}
+              </h1>
+              <p className="text-lg text-slate-600">
+                {Array.isArray(section.content) ? section.content.join(', ') : (section.content || 'Professional Title')}
+              </p>
+            </div>
+          )}
+          
+          {section.type === 'contact' && (
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 mb-2 border-b border-slate-300 pb-1">
+                {section.title || 'Contact Information'}
+              </h2>
+              <div className="text-slate-700 whitespace-pre-line">
+                {Array.isArray(section.content) ? section.content.join(', ') : (section.content || 'Add your contact information')}
+              </div>
+            </div>
+          )}
+          
+          {section.type === 'skills' && (
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 mb-2 border-b border-slate-300 pb-1">
+                {section.title || 'Skills'}
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {(Array.isArray(section.content) ? section.content : 
+                  (section.content ? section.content.split(',').map(s => s.trim()) : [])
+                ).map((skill, index) => (
+                  <span key={index} className="skills-tag bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {!['header', 'contact', 'skills'].includes(section.type) && (
+            <div>
+              {section.title && (
+                <h2 className="text-lg font-semibold text-slate-900 mb-2 border-b border-slate-300 pb-1">
+                  {section.title}
+                </h2>
+              )}
+              <div className="text-slate-700 whitespace-pre-line">
+                {Array.isArray(section.content) ? section.content.join(', ') : (section.content || 'Add content here')}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+    
+    // Multi-column row
+    const columnsInRow = sections[0]?.columnsInRow || sections.length;
+    
+    return (
+      <div key={`preview-row-${sections[0].row}`} className="flex gap-4 w-full resume-section">
+        {sections.map((section) => (
+          <div key={section.id} style={{ width: `${100 / columnsInRow}%` }}>
+            {section.type === 'header' && (
+              <div className="resume-header">
+                <h1 className="text-2xl font-bold text-slate-900 mb-2">
+                  {section.title || 'Your Name'}
+                </h1>
+                <p className="text-base text-slate-600">
+                  {Array.isArray(section.content) ? section.content.join(', ') : (section.content || 'Professional Title')}
+                </p>
+              </div>
+            )}
+            
+            {section.type === 'contact' && (
+              <div>
+                <h2 className="text-base font-semibold text-slate-900 mb-2 border-b border-slate-300 pb-1">
+                  {section.title || 'Contact Information'}
+                </h2>
+                <div className="text-slate-700 text-sm whitespace-pre-line">
+                  {Array.isArray(section.content) ? section.content.join(', ') : (section.content || 'Add your contact information')}
+                </div>
+              </div>
+            )}
+            
+            {section.type === 'skills' && (
+              <div>
+                <h2 className="text-base font-semibold text-slate-900 mb-2 border-b border-slate-300 pb-1">
+                  {section.title || 'Skills'}
+                </h2>
+                <div className="flex flex-wrap gap-1">
+                  {(Array.isArray(section.content) ? section.content : 
+                    (section.content ? section.content.split(',').map(s => s.trim()) : [])
+                  ).map((skill, index) => (
+                    <span key={index} className="skills-tag bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {!['header', 'contact', 'skills'].includes(section.type) && (
+              <div>
+                {section.title && (
+                  <h2 className="text-base font-semibold text-slate-900 mb-2 border-b border-slate-300 pb-1">
+                    {section.title}
+                  </h2>
+                )}
+                <div className="text-slate-700 text-sm whitespace-pre-line">
+                  {Array.isArray(section.content) ? section.content.join(', ') : (section.content || 'Add content here')}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <AppLayout showHeader={false}>
       <div className="space-y-6">
@@ -179,14 +518,16 @@ export const Editor: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-between"
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 lg:gap-4">
             <Button
               variant="ghost"
-              size="icon"
-              onClick={() => navigate('/projects')}
-              className="text-slate-600 hover:text-slate-900"
+              onClick={() => navigate('/dashboard')}
+              className="gap-2 text-slate-600 hover:text-slate-900 h-9"
+              size="sm"
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft size={16} />
+              <span className="hidden sm:inline">Back to Dashboard</span>
+              <span className="sm:hidden">Back</span>
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-slate-900">
@@ -202,24 +543,25 @@ export const Editor: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => setShowPreview(!showPreview)}
-              className="gap-2 text-xs lg:text-sm xl:hidden"
+              className="gap-2 text-xs lg:text-sm h-9"
               size="sm"
             >
               {showPreview ? <EyeOff size={14} /> : <Eye size={14} />}
-              Preview
+              <span className="hidden sm:inline">Preview</span>
+              <span className="sm:hidden">Preview</span>
             </Button>
             <button
               onClick={() => setShowAiModal(true)}
-              className="btn-ai gap-2 text-xs lg:text-sm px-3 py-2 group"
+              className="btn-ai gap-2 text-xs lg:text-sm h-9 px-3 py-2 group flex items-center justify-center rounded-lg"
             >
-              <Wand2 size={16} className="group-hover:rotate-12 transition-transform duration-300" />
+              <Wand2 size={14} className="group-hover:rotate-12 transition-transform duration-300" />
               <span className="hidden sm:inline font-bold">AI Generate</span>
               <span className="sm:hidden font-bold">AI</span>
             </button>
             <Button
               variant="outline"
               onClick={handleExportPDF}
-              className="gap-2 text-xs lg:text-sm"
+              className="gap-2 text-xs lg:text-sm h-9"
               size="sm"
             >
               <Download size={14} />
@@ -243,7 +585,7 @@ export const Editor: React.FC = () => {
                 <CardTitle className="flex items-center justify-between">
                   <span>Editor</span>
                   <Button
-                    onClick={handleAddSection}
+                    onClick={() => handleAddSection()}
                     size="sm"
                     className="gap-2"
                   >
@@ -253,26 +595,49 @@ export const Editor: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {sortedLayout.map((section, index) => (
-                  <motion.div
-                    key={section.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
+                <DndContext 
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext 
+                    items={sortedLayout.map(section => section.id)}
+                    strategy={verticalListSortingStrategy}
                   >
-                    <EditableSection
-                      section={section}
-                      onUpdate={handleSectionUpdate}
-                      onDelete={handleSectionDelete}
+                    {/* Drop zone at the beginning */}
+                    <SectionDropZone 
+                      position={0} 
+                      onAddSection={handleAddSection}
                     />
-                  </motion.div>
-                ))}
+                    
+                    {Object.keys(organizedRows)
+                      .sort((a, b) => parseInt(a) - parseInt(b))
+                      .map(rowKey => {
+                        const rowIndex = parseInt(rowKey);
+                        const sections = organizedRows[rowIndex];
+                        return renderSectionRow(sections, rowIndex);
+                      })
+                    }
+                  </SortableContext>
+                  <DragOverlay>
+                    {activeId ? (
+                      <div className="opacity-90 scale-105 shadow-2xl">
+                        <EditableSection
+                          section={sortedLayout.find(s => s.id === activeId)!}
+                          onUpdate={() => {}}
+                          onDelete={() => {}}
+                        />
+                      </div>
+                    ) : null}
+                  </DragOverlay>
+                </DndContext>
               </CardContent>
             </Card>
           </motion.div>
 
           {/* Preview */}
-          {(showPreview || isDesktop) && (
+          {showPreview && (
             <motion.div 
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -291,61 +656,14 @@ export const Editor: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="bg-white border border-slate-200 rounded-lg p-8 resume-preview" ref={printRef}>
-                    {sortedLayout.map((section) => (
-                      <div key={section.id} className="resume-section">
-                        {section.type === 'header' && (
-                          <div className="resume-header">
-                            <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                              {section.title || 'Your Name'}
-                            </h1>
-                            <p className="text-lg text-slate-600">
-                              {Array.isArray(section.content) ? section.content.join(', ') : (section.content || 'Professional Title')}
-                            </p>
-                          </div>
-                        )}
-                        
-                        {section.type === 'contact' && (
-                          <div>
-                            <h2 className="text-lg font-semibold text-slate-900 mb-2 border-b border-slate-300 pb-1">
-                              {section.title || 'Contact Information'}
-                            </h2>
-                            <div className="text-slate-700 whitespace-pre-line">
-                              {Array.isArray(section.content) ? section.content.join(', ') : (section.content || 'Add your contact information')}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {section.type === 'skills' && (
-                          <div>
-                            <h2 className="text-lg font-semibold text-slate-900 mb-2 border-b border-slate-300 pb-1">
-                              {section.title || 'Skills'}
-                            </h2>
-                            <div className="flex flex-wrap gap-2">
-                              {(Array.isArray(section.content) ? section.content : 
-                                (section.content ? section.content.split(',').map(s => s.trim()) : [])
-                              ).map((skill, index) => (
-                                <span key={index} className="skills-tag bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
-                                  {skill}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {!['header', 'contact', 'skills'].includes(section.type) && (
-                          <div>
-                            {section.title && (
-                              <h2 className="text-lg font-semibold text-slate-900 mb-2 border-b border-slate-300 pb-1">
-                                {section.title}
-                              </h2>
-                            )}
-                            <div className="text-slate-700 whitespace-pre-line">
-                              {Array.isArray(section.content) ? section.content.join(', ') : (section.content || 'Add content here')}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                    {Object.keys(organizedRows)
+                      .sort((a, b) => parseInt(a) - parseInt(b))
+                      .map(rowKey => {
+                        const rowIndex = parseInt(rowKey);
+                        const sections = organizedRows[rowIndex];
+                        return renderPreviewRow(sections);
+                      })
+                    }
                   </div>
                 </CardContent>
               </Card>
@@ -356,11 +674,11 @@ export const Editor: React.FC = () => {
 
       {/* AI Generate Modal */}
       {showAiModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[40000]">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl p-6 w-full max-w-md mx-4"
+            className="bg-white rounded-xl p-6 w-full max-w-md mx-4 relative z-[40000]"
           >
             <h3 className="text-lg font-semibold text-slate-900 mb-4">
               Generate with AI
@@ -376,14 +694,15 @@ export const Editor: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowAiModal(false)}
-                className="flex-1"
+                className="flex-1 h-10"
+                size="default"
               >
                 Cancel
               </Button>
               <button
                 onClick={handleGenerateLayout}
                 disabled={isGenerating || !aiPrompt.trim()}
-                className={`btn-ai flex-1 gap-2 disabled:opacity-50 disabled:cursor-not-allowed group ${
+                className={`btn-ai flex-1 gap-2 h-10 px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed group flex items-center justify-center ${
                   isGenerating ? 'animate-pulse' : ''
                 }`}
               >

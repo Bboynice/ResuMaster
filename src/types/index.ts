@@ -23,6 +23,10 @@ export interface LayoutSection {
   url?: string;
   order: number;
   isEditing?: boolean;
+  // Column layout properties
+  row?: number; // Which row this section belongs to
+  column?: number; // Which column within the row (0-based)
+  columnsInRow?: number; // Total number of columns in this row
 }
 
 export interface ExperienceItem {
@@ -89,7 +93,7 @@ export interface ProjectContextType {
   projects: Project[];
   currentProject: Project | null;
   loading: boolean;
-  createProject: (title: string, type: 'resume' | 'cover-letter', templateLayout?: LayoutSection[]) => Promise<string>;
+  createProject: (title: string, type: 'resume' | 'cover-letter', templateLayout?: LayoutSection[]) => Promise<Project>;
   updateProject: (id: string, updates: Partial<Project>) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
   setCurrentProject: (project: Project | null) => void;

@@ -126,7 +126,7 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
     return unsubscribe;
   }, [user, isDemoMode]);
 
-  const createProject = async (title: string, type: 'resume' | 'cover-letter', templateLayout?: LayoutSection[]): Promise<string> => {
+  const createProject = async (title: string, type: 'resume' | 'cover-letter', templateLayout?: LayoutSection[]): Promise<Project> => {
     if (!user) {
       throw new Error('User must be logged in to create projects');
     }
@@ -159,16 +159,23 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
           {
             id: 'header-1',
             type: 'header',
-            title: 'Cover Letter',
-            content: 'Your Name',
+            title: 'Your Name',
+            content: 'Professional Title',
             order: 0
+          },
+          {
+            id: 'contact-1',
+            type: 'contact',
+            title: 'Contact Information',
+            content: 'your.email@example.com | (555) 123-4567\n[Date]\n\n[Hiring Manager Name]\n[Company Name]',
+            order: 1
           },
           {
             id: 'text-1',
             type: 'text',
             title: 'Introduction',
             content: 'Dear Hiring Manager,\n\nI am writing to express my interest in the [Position Title] position at [Company Name].',
-            order: 1
+            order: 2
           }
         ]);
 
@@ -188,7 +195,7 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
       const updatedProjects = [newProject, ...projects];
       setProjects(updatedProjects);
       localStorage.setItem('demo_projects', JSON.stringify(updatedProjects));
-      return projectId;
+      return newProject;
     }
 
     try {
@@ -202,7 +209,19 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
       };
 
       const docRef = await addDoc(collection(db, 'projects'), projectData);
-      return docRef.id;
+      
+      // Return the full project object
+      const newProject: Project = {
+        id: docRef.id,
+        title,
+        type,
+        userId: user.uid,
+        layout: defaultLayout,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      
+      return newProject;
     } catch (error) {
       console.error('Error creating project:', error);
       throw new Error('Failed to create project');

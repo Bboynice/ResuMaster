@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, Filter, FileText, Calendar } from 'lucide-react';
+import { Plus, Search, Filter, FileText, Calendar, SortAsc } from 'lucide-react';
 import { useProjects } from '../contexts/ProjectContext';
 import { ProjectCard } from '../components/Dashboard/ProjectCard';
 import { CreateProjectModal } from '../components/Dashboard/CreateProjectModal';
 import { AppLayout } from '../components/Layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import { Select } from '../components/ui/select';
 
 export const AllProjects: React.FC = () => {
   const { projects, loading } = useProjects();
@@ -14,6 +15,8 @@ export const AllProjects: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'resume' | 'cover-letter'>('all');
   const [sortBy, setSortBy] = useState<'updated' | 'created' | 'name'>('updated');
+  
+  console.log('AllProjects state - filterType:', filterType, 'sortBy:', sortBy);
 
   // Filter and sort projects
   const filteredProjects = projects
@@ -23,13 +26,20 @@ export const AllProjects: React.FC = () => {
       return matchesSearch && matchesType;
     })
     .sort((a, b) => {
+      console.log('Sorting by:', sortBy);
       switch (sortBy) {
         case 'updated':
-          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+          const updatedDiff = new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+          console.log(`Updated sort: ${a.title} (${a.updatedAt}) vs ${b.title} (${b.updatedAt}) = ${updatedDiff}`);
+          return updatedDiff;
         case 'created':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          const createdDiff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          console.log(`Created sort: ${a.title} (${a.createdAt}) vs ${b.title} (${b.createdAt}) = ${createdDiff}`);
+          return createdDiff;
         case 'name':
-          return a.title.localeCompare(b.title);
+          const nameDiff = a.title.localeCompare(b.title);
+          console.log(`Name sort: ${a.title} vs ${b.title} = ${nameDiff}`);
+          return nameDiff;
         default:
           return 0;
       }
@@ -86,54 +96,55 @@ export const AllProjects: React.FC = () => {
               <CardTitle className="text-2xl font-black text-neutral-900">Search & Filter</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6 lg:space-y-0 lg:flex lg:flex-row lg:gap-6">
+              <div className="space-y-6 lg:space-y-0 lg:flex lg:flex-row lg:items-center lg:gap-6">
                 {/* Search */}
                 <div className="flex-1">
                   <div className="relative">
-                    <Search size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400" />
+                    <Search size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400 z-10" />
                     <input
                       type="text"
                       placeholder="Search projects..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-12 input-field text-base font-medium"
+                      className="pl-12 input-field text-base font-medium h-12"
                     />
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 lg:gap-6">
+                <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 lg:items-center">
                   {/* Type Filter */}
                   <div className="flex gap-3 items-center min-w-0">
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <Filter size={18} className="text-neutral-500" />
-                      <span className="text-sm lg:text-base font-bold text-neutral-700">Filter:</span>
-                    </div>
-                    <select
+                    <span className="text-sm lg:text-base font-bold text-neutral-700 whitespace-nowrap">Filter:</span>
+                    <Select
                       value={filterType}
-                      onChange={(e) => setFilterType(e.target.value as 'all' | 'resume' | 'cover-letter')}
-                      className="px-4 py-3 border border-neutral-200 rounded-xl text-sm lg:text-base font-medium focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-neutral-400 bg-white/50 backdrop-blur-sm flex-1 lg:flex-none transition-all duration-300"
-                    >
-                      <option value="all">All Types</option>
-                      <option value="resume">Resumes</option>
-                      <option value="cover-letter">Cover Letters</option>
-                    </select>
+                      onChange={(value) => setFilterType(value as 'all' | 'resume' | 'cover-letter')}
+                      options={[
+                        { value: 'all', label: 'All Types' },
+                        { value: 'resume', label: 'Resumes' },
+                        { value: 'cover-letter', label: 'Cover Letters' }
+                      ]}
+                      icon={<Filter size={16} />}
+                      className="flex-1 lg:flex-none lg:w-40"
+                    />
                   </div>
 
                   {/* Sort */}
                   <div className="flex gap-3 items-center min-w-0">
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <Calendar size={18} className="text-neutral-500" />
-                      <span className="text-sm lg:text-base font-bold text-neutral-700">Sort:</span>
-                    </div>
-                    <select
+                    <span className="text-sm lg:text-base font-bold text-neutral-700 whitespace-nowrap">Sort:</span>
+                    <Select
                       value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value as 'updated' | 'created' | 'name')}
-                      className="px-4 py-3 border border-neutral-200 rounded-xl text-sm lg:text-base font-medium focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-neutral-400 bg-white/50 backdrop-blur-sm flex-1 lg:flex-none transition-all duration-300"
-                    >
-                      <option value="updated">Last Updated</option>
-                      <option value="created">Date Created</option>
-                      <option value="name">Name (A-Z)</option>
-                    </select>
+                      onChange={(value) => {
+                        console.log('Sort changed to:', value);
+                        setSortBy(value as 'updated' | 'created' | 'name');
+                      }}
+                      options={[
+                        { value: 'updated', label: 'Last Updated' },
+                        { value: 'created', label: 'Date Created' },
+                        { value: 'name', label: 'Name (A-Z)' }
+                      ]}
+                      icon={<SortAsc size={16} />}
+                      className="flex-1 lg:flex-none lg:w-44"
+                    />
                   </div>
                 </div>
               </div>
@@ -159,13 +170,7 @@ export const AllProjects: React.FC = () => {
                     <p className="text-neutral-600 mb-8 max-w-md mx-auto text-lg">
                       Create your first <span className="gradient-text font-bold">project</span> to get started
                     </p>
-                    <button
-                      onClick={() => setShowCreateModal(true)}
-                      className="btn-primary gap-3 group"
-                    >
-                      <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
-                      <span className="font-bold">Create Your First Project</span>
-                    </button>
+                   
                   </>
                 ) : (
                   <>

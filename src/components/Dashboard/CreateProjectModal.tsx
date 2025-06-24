@@ -29,13 +29,10 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, 
     setLoading(true);
     
     try {
-      const projectId = await createProject(title.trim(), type);
+      const newProject = await createProject(title.trim(), type);
       
-      // Find the newly created project and set it as current
-      const newProject = projects.find(p => p.id === projectId);
-      if (newProject) {
-        setCurrentProject(newProject);
-      }
+      // Set the newly created project as current
+      setCurrentProject(newProject);
       
       // Reset form
       setTitle('');
@@ -43,7 +40,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, 
       onClose();
       
       // Navigate to editor
-      navigate(`/editor/${projectId}`);
+      navigate(`/editor/${newProject.id}`);
     } catch (error: any) {
       setError(error.message || 'Failed to create project');
     } finally {
@@ -63,8 +60,8 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="card-elevated max-w-md w-full mx-4 p-8">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[99999]">
+      <div className="card-elevated max-w-md w-full mx-4 p-8 relative z-[99999]">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold text-neutral-900">Create New <span className="gradient-text">Project</span></h2>
           <button

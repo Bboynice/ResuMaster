@@ -19,7 +19,7 @@ export const testOpenAIConnection = async (): Promise<{ success: boolean; error?
 
     // Make a simple test request
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-nano',
       messages: [{ role: 'user', content: 'Say "Hello"' }],
       max_tokens: 5
     });
@@ -63,15 +63,22 @@ export const generateLayout = async ({ prompt, currentLayout, projectType }: AIG
       }
     ]
     
+    CRITICAL CONTENT FORMATTING RULES:
+    - content MUST be either a STRING or an ARRAY OF STRINGS
+    - NEVER use objects like {Name: "John", Phone: "123"} 
+    - For contact info, use a single string with line breaks: "john@email.com\n(555) 123-4567\nLinkedIn: linkedin.com/in/john"
+    - For skills, use an array: ["JavaScript", "React", "Node.js"]
+    - For other sections, use plain text strings with \n for line breaks
+    
     Available types:
-    - header: Main name/title section
-    - contact: Contact information
-    - photo: Profile photo placeholder
-    - section: General text section
-    - skills: List of skills
-    - experience: Work experience
-    - education: Educational background
-    - text: Free text area
+    - header: Main name/title section (content should be professional title as string)
+    - contact: Contact information (content should be formatted string with \n separators)
+    - photo: Profile photo placeholder (content should be descriptive string)
+    - section: General text section (content should be plain text string)
+    - skills: List of skills (content should be array of skill strings)
+    - experience: Work experience (content should be formatted text string)
+    - education: Educational background (content should be formatted text string)
+    - text: Free text area (content should be plain text string)
     
     Generate a professional, well-structured layout that matches the user's request.`;
 
@@ -82,7 +89,7 @@ export const generateLayout = async ({ prompt, currentLayout, projectType }: AIG
     Please provide only the JSON array, no additional text.`;
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-nano',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
@@ -99,12 +106,45 @@ export const generateLayout = async ({ prompt, currentLayout, projectType }: AIG
     // Parse the JSON response
     const layout = JSON.parse(content.trim()) as LayoutSection[];
     
+    // Validate and sanitize content to ensure proper format
+    const sanitizedLayout = layout.map((section, index) => {
+      let sanitizedContent: string | string[];
+      
+      // Handle different content types and ensure proper format
+      if (typeof section.content === 'object' && section.content !== null && !Array.isArray(section.content)) {
+        // Convert object to string format
+        const obj = section.content as Record<string, any>;
+        if (section.type === 'contact') {
+          // Convert contact object to formatted string
+          sanitizedContent = Object.entries(obj)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join('\n');
+        } else {
+          // For other types, convert to simple string
+          sanitizedContent = Object.values(obj).join(', ');
+        }
+      } else if (Array.isArray(section.content)) {
+        // Ensure array contains only strings
+        sanitizedContent = section.content.map(item => 
+          typeof item === 'string' ? item : String(item)
+        );
+      } else if (typeof section.content === 'string') {
+        sanitizedContent = section.content;
+      } else {
+        // Fallback for any other type
+        sanitizedContent = String(section.content || '');
+      }
+      
+      return {
+        ...section,
+        id: section.id || `section-${Date.now()}-${index}`,
+        order: section.order || index,
+        content: sanitizedContent
+      };
+    });
+    
     // Ensure each section has a unique ID and proper order
-    return layout.map((section, index) => ({
-      ...section,
-      id: section.id || `section-${Date.now()}-${index}`,
-      order: section.order || index
-    }));
+    return sanitizedLayout;
 
   } catch (error: any) {
     console.error('Error generating layout:', error);
@@ -142,7 +182,7 @@ export const rewriteText = async ({ text, context, tone = 'professional' }: AIRe
     - Return only the rewritten text, no additional commentary`;
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-nano',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: `Rewrite this text: "${text}"` }
@@ -221,30 +261,37 @@ export const mockGenerateLayout = (projectType: 'resume' | 'cover-letter'): Layo
       {
         id: 'header-1',
         type: 'header',
-        title: 'Cover Letter',
-        content: 'John Doe',
+        title: 'John Doe',
+        content: 'Professional Title',
         order: 0
+      },
+      {
+        id: 'contact-1',
+        type: 'contact',
+        title: 'Contact Information',
+        content: 'john.doe@email.com | (555) 123-4567\n[Date]\n\n[Hiring Manager Name]\n[Company Name]',
+        order: 1
       },
       {
         id: 'text-1',
         type: 'text',
         title: 'Introduction',
         content: 'Dear Hiring Manager,\n\nI am writing to express my interest in the position...',
-        order: 1
+        order: 2
       },
       {
         id: 'text-2',
         type: 'text',
         title: 'Body',
         content: 'In my previous role, I have demonstrated...',
-        order: 2
+        order: 3
       },
       {
         id: 'text-3',
         type: 'text',
         title: 'Closing',
         content: 'Thank you for your consideration.\n\nSincerely,\nJohn Doe',
-        order: 3
+        order: 4
       }
     ];
   }

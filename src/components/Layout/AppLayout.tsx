@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Menu } from 'lucide-react';
-import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { Button } from '../ui/button';
+import { useSidebar } from '../../contexts/SidebarContext';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -14,38 +14,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   children, 
   showHeader = true 
 }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Handle responsive behavior
-  useEffect(() => {
-    const checkScreenSize = () => {
-      const isMobileView = window.innerWidth < 1024; // lg breakpoint
-      setIsMobile(isMobileView);
-      
-      // Only auto-close sidebar on mobile initially, don't auto-open/close after that
-      if (isMobileView && sidebarOpen && window.innerWidth < 640) {
-        setSidebarOpen(false);
-      }
-    };
-
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    return () => window.removeEventListener('resize', checkScreenSize);
-  }, []);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  const { isOpen: sidebarOpen, isMobile, toggleSidebar } = useSidebar();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-50/50">
-      <Sidebar 
-        isOpen={sidebarOpen} 
-        onToggle={toggleSidebar} 
-        isMobile={isMobile}
-      />
-      
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-50/50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900/50 transition-colors duration-300">
       {/* Mobile Header with Menu Button */}
       {isMobile && (
         <motion.div 
@@ -57,15 +29,15 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             variant="ghost"
             size="icon"
             onClick={toggleSidebar}
-            className="h-10 w-10 hover:bg-neutral-100/80 rounded-xl"
+            className="h-10 w-10 hover:bg-neutral-100/80 dark:hover:bg-neutral-700/50 rounded-xl"
           >
             <Menu size={22} />
           </Button>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 bg-gradient-to-br from-neutral-800 to-neutral-900 dark:from-emerald-600 dark:to-emerald-700 rounded-xl flex items-center justify-center shadow-lg">
               <span className="text-white text-lg font-bold">R</span>
             </div>
-            <span className="font-bold text-xl text-neutral-900">ResuMaster</span>
+            <span className="font-bold text-xl text-neutral-900 dark:text-neutral-100">ResuMaster</span>
           </div>
           <div className="w-10" /> {/* Spacer for centering */}
         </motion.div>
@@ -77,7 +49,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           marginLeft: isMobile ? 0 : sidebarOpen ? 280 : 80,
         }}
         transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-        className="min-h-screen"
+        className="min-h-screen overflow-x-hidden"
+        style={{
+          maxWidth: isMobile ? '100vw' : `calc(100vw - ${sidebarOpen ? 280 : 80}px)`,
+        }}
       >
         {showHeader && !isMobile && <Header />}
         
