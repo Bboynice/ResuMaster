@@ -677,7 +677,7 @@ export const Templates: React.FC = () => {
                   </span>
                 </button>
               </div>
-            </div>
+          </div>
           </div>,
           document.body
         )}

@@ -97,7 +97,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, isMobile }) 
             variant="ghost"
             size="icon"
             onClick={onToggle}
-            className="h-24 w-6 bg-white/100 dark:bg-neutral-900/70 hover:bg-neutral-100/80 dark:hover:bg-neutral-700/50 rounded-r-lg rounded-l-none border-r-2 border-t-2 border-b-2 border-l-2 border-neutral-200/30 dark:border-neutral-700/30 backdrop-blur-xl transition-colors duration-300"
+            className="h-24 w-6 bg-white/100 dark:bg-neutral-900/70 hover:bg-neutral-100/80 dark:hover:bg-neutral-700/50 !rounded-r-lg !rounded-l-none border-r-2 border-t-2 border-b-2 border-l-0 border-neutral-200/30 dark:border-neutral-700/30 backdrop-blur-xl transition-colors duration-300 overflow-hidden"
+            style={{ 
+              borderTopLeftRadius: '0px',
+              borderBottomLeftRadius: '0px',
+              borderTopRightRadius: '0.5rem',
+              borderBottomRightRadius: '0.5rem'
+            }}
           >
             <motion.div
               animate={{ rotate: isOpen ? 0 : 180 }}

@@ -28,7 +28,7 @@ export const Dashboard: React.FC = () => {
             <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-purple-600 via-pink-600 to-purple-700 mx-auto mb-6 flex items-center justify-center animate-pulse-slow glow-effect">
               <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
             </div>
-            <p className="text-neutral-600 text-lg font-medium">Loading your <span className="gradient-text font-bold">dashboard</span>...</p>
+            <p className="text-neutral-600 dark:text-neutral-400 text-lg font-medium">Loading your <span className="gradient-text font-bold">dashboard</span>...</p>
           </div>
         </div>
       </AppLayout>
@@ -46,8 +46,8 @@ export const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl lg:text-5xl font-black text-neutral-900 mb-3">Dashboard</h1>
-          <p className="text-neutral-600 text-lg lg:text-xl font-medium">
+          <h1 className="text-4xl lg:text-5xl font-black text-neutral-900 dark:text-neutral-100 mb-3">Dashboard</h1>
+          <p className="text-neutral-600 dark:text-neutral-400 text-lg lg:text-xl font-medium">
             Welcome back! Here's what's happening with your <span className="gradient-text font-bold">projects</span>.
           </p>
         </motion.div>
@@ -63,12 +63,12 @@ export const Dashboard: React.FC = () => {
             <Card className="card-elevated p-8 group-hover:scale-[1.02] transition-all duration-500">
               <CardContent className="p-0">
                 <div className="flex items-center gap-6">
-                  <div className="p-4 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-2xl shadow-sm group-hover:shadow-md transition-all duration-300">
-                    <FileText size={28} className="text-neutral-700" />
+                  <div className="p-4 bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-700 dark:to-neutral-800 rounded-2xl shadow-sm group-hover:shadow-md transition-all duration-300">
+                    <FileText size={28} className="text-neutral-700 dark:text-neutral-300" />
                   </div>
                   <div>
-                    <p className="text-4xl font-black text-neutral-900 mb-1">{projects.length}</p>
-                    <p className="text-sm font-bold text-neutral-500 uppercase tracking-wider">Total Projects</p>
+                    <p className="text-4xl font-black text-neutral-900 dark:text-neutral-100 mb-1">{projects.length}</p>
+                    <p className="text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Total Projects</p>
                   </div>
                 </div>
               </CardContent>
@@ -84,12 +84,12 @@ export const Dashboard: React.FC = () => {
             <Card className="card-elevated p-8 group-hover:scale-[1.02] transition-all duration-500">
               <CardContent className="p-0">
                 <div className="flex items-center gap-6">
-                  <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl shadow-sm group-hover:shadow-md transition-all duration-300">
-                    <FileText size={28} className="text-purple-700" />
+                  <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 rounded-2xl shadow-sm group-hover:shadow-md transition-all duration-300">
+                    <FileText size={28} className="text-purple-700 dark:text-purple-400" />
                   </div>
                   <div>
-                    <p className="text-4xl font-black text-neutral-900 mb-1">{resumeCount}</p>
-                    <p className="text-sm font-bold text-neutral-500 uppercase tracking-wider">Resumes</p>
+                    <p className="text-4xl font-black text-neutral-900 dark:text-neutral-100 mb-1">{resumeCount}</p>
+                    <p className="text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Resumes</p>
                   </div>
                 </div>
               </CardContent>
@@ -105,12 +105,12 @@ export const Dashboard: React.FC = () => {
             <Card className="card-elevated p-8 group-hover:scale-[1.02] transition-all duration-500">
               <CardContent className="p-0">
                 <div className="flex items-center gap-6">
-                  <div className="p-4 bg-gradient-to-br from-pink-100 to-pink-200 rounded-2xl shadow-sm group-hover:shadow-md transition-all duration-300">
-                    <Calendar size={28} className="text-pink-700" />
+                  <div className="p-4 bg-gradient-to-br from-pink-100 to-pink-200 dark:from-pink-900/30 dark:to-pink-800/30 rounded-2xl shadow-sm group-hover:shadow-md transition-all duration-300">
+                    <Calendar size={28} className="text-pink-700 dark:text-pink-400" />
                   </div>
                   <div>
-                    <p className="text-4xl font-black text-neutral-900 mb-1">{coverLetterCount}</p>
-                    <p className="text-sm font-bold text-neutral-500 uppercase tracking-wider">Cover Letters</p>
+                    <p className="text-4xl font-black text-neutral-900 dark:text-neutral-100 mb-1">{coverLetterCount}</p>
+                    <p className="text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Cover Letters</p>
                   </div>
                 </div>
               </CardContent>
@@ -127,8 +127,8 @@ export const Dashboard: React.FC = () => {
         >
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 className="text-3xl lg:text-4xl font-black text-neutral-900">Recent Projects</h2>
-              <p className="text-lg lg:text-xl text-neutral-600 font-medium">Your most recently updated projects</p>
+              <h2 className="text-3xl lg:text-4xl font-black text-neutral-900 dark:text-neutral-100">Recent Projects</h2>
+              <p className="text-lg lg:text-xl text-neutral-600 dark:text-neutral-400 font-medium">Your most recently updated projects</p>
             </div>
             {projects.length > 4 && (
               <button className="btn-secondary w-full lg:w-auto">
@@ -140,13 +140,13 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {projects.length === 0 ? (
-            <Card className="card-elevated border-dashed border-2 border-neutral-300">
+            <Card className="card-elevated border-dashed border-2 border-neutral-300 dark:border-neutral-600">
               <CardContent className="p-16 text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-3xl flex items-center justify-center mx-auto mb-6 floating-element">
-                  <FileText size={32} className="text-neutral-600" />
+                <div className="w-20 h-20 bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-700 dark:to-neutral-800 rounded-3xl flex items-center justify-center mx-auto mb-6 floating-element">
+                  <FileText size={32} className="text-neutral-600 dark:text-neutral-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-neutral-900 mb-3">No projects yet</h3>
-                <p className="text-neutral-600 mb-8 max-w-md mx-auto text-lg">
+                <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">No projects yet</h3>
+                <p className="text-neutral-600 dark:text-neutral-400 mb-8 max-w-md mx-auto text-lg">
                   Get started by creating your first <span className="gradient-text font-bold">resume</span> or <span className="gradient-text font-bold">cover letter</span> project.
                 </p>
                
@@ -179,8 +179,8 @@ export const Dashboard: React.FC = () => {
         >
           <Card className="card-elevated">
             <CardHeader className="pb-6">
-              <CardTitle className="flex items-center gap-3 text-2xl font-black text-neutral-900">
-                <TrendingUp size={28} className="text-purple-600 floating-element" />
+              <CardTitle className="flex items-center gap-3 text-2xl font-black text-neutral-900 dark:text-neutral-100">
+                <TrendingUp size={28} className="text-purple-600 dark:text-purple-400 floating-element" />
                 Quick Actions
               </CardTitle>
             </CardHeader>
@@ -201,11 +201,11 @@ export const Dashboard: React.FC = () => {
                   className="btn-secondary h-24 lg:h-28 flex-col gap-3 text-left flex justify-center items-center group hover:scale-[1.02] transition-all duration-300"
                   onClick={() => window.location.href = '/templates'}
                 >
-                  <div className="flex items-center gap-3 text-lg font-bold text-neutral-900">
+                  <div className="flex items-center gap-3 text-lg font-bold text-neutral-900 dark:text-neutral-100">
                     <FileText size={20} className="group-hover:scale-110 transition-transform duration-300" />
                     Browse Templates
                   </div>
-                  <p className="text-sm text-neutral-600 font-medium">Explore professional resume templates</p>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400 font-medium">Explore professional resume templates</p>
                 </button>
               </div>
             </CardContent>

@@ -41,7 +41,7 @@ export const SectionDropZone: React.FC<SectionDropZoneProps> = ({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={handleAddSection}
-              className="w-6 h-6 bg-purple-600 hover:bg-purple-700 text-white rounded-full flex items-center justify-center shadow-lg transition-colors duration-200 z-30"
+              className="section-add-button w-6 h-6 text-white rounded-full flex items-center justify-center shadow-lg z-30"
               title={`Add section to the ${side}`}
             >
               <Plus size={12} />
@@ -56,7 +56,7 @@ export const SectionDropZone: React.FC<SectionDropZoneProps> = ({
               initial={{ opacity: 0, scaleY: 0 }}
               animate={{ opacity: 1, scaleY: 1 }}
               exit={{ opacity: 0, scaleY: 0 }}
-              className="absolute left-1/2 top-0 w-0.5 h-full bg-purple-600 z-20 transform -translate-x-1/2"
+              className="absolute left-1/2 top-0 w-0.5 h-full section-add-line z-20 transform -translate-x-1/2"
             />
           )}
         </AnimatePresence>
@@ -77,7 +77,7 @@ export const SectionDropZone: React.FC<SectionDropZoneProps> = ({
             initial={{ opacity: 0, scaleX: 0 }}
             animate={{ opacity: 1, scaleX: 1 }}
             exit={{ opacity: 0, scaleX: 0 }}
-            className="absolute inset-x-0 top-1/2 transform -translate-y-1/2 h-0.5 bg-purple-600 z-20"
+            className="absolute inset-x-0 top-1/2 transform -translate-y-1/2 h-0.5 section-add-line z-20"
           />
         )}
       </AnimatePresence>
@@ -92,7 +92,7 @@ export const SectionDropZone: React.FC<SectionDropZoneProps> = ({
           >
             <button
               onClick={handleAddSection}
-              className="w-8 h-8 bg-purple-600 hover:bg-purple-700 text-white rounded-full flex items-center justify-center shadow-lg transition-colors duration-200"
+              className="section-add-button w-8 h-8 text-white rounded-full flex items-center justify-center shadow-lg"
               title="Add section here"
             >
               <Plus size={16} />

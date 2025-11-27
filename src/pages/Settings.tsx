@@ -93,12 +93,12 @@ export const Settings: React.FC = () => {
         </div>
 
         {isDemoMode && (
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
             <div className="flex items-center gap-2">
-              <AlertCircle size={20} className="text-blue-600" />
+              <AlertCircle size={20} className="text-blue-600 dark:text-blue-400" />
               <div>
-                <h3 className="text-sm font-medium text-blue-900">Demo Mode</h3>
-                <p className="text-sm text-blue-700">
+                <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100">Demo Mode</h3>
+                <p className="text-sm text-blue-700 dark:text-blue-200">
                   You're in demo mode. Changes will be saved locally and cleared when you log out.
                 </p>
               </div>
@@ -108,12 +108,12 @@ export const Settings: React.FC = () => {
 
         <div className="card p-8">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-              <User size={24} className="text-primary-600" />
+            <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center">
+              <User size={24} className="text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
-              <p className="text-sm text-gray-600">Update your personal information.</p>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Profile Information</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Update your personal information.</p>
             </div>
           </div>
 
@@ -140,7 +140,7 @@ export const Settings: React.FC = () => {
 
           <form onSubmit={handleSave} className="space-y-6">
             <div>
-              <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Display Name
               </label>
               <input
@@ -151,13 +151,13 @@ export const Settings: React.FC = () => {
                 className="input-field"
                 placeholder="Enter your display name"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 This is how your name will appear in the app.
               </p>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email Address
               </label>
               <input
@@ -169,18 +169,18 @@ export const Settings: React.FC = () => {
                 placeholder="Enter your email address"
                 disabled={!isDemoMode}
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {isDemoMode 
                   ? "You can change your email in demo mode." 
                   : "Email changes require re-authentication and are currently disabled."}
               </p>
             </div>
 
-            <div className="pt-4 border-t border-gray-200">
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900">Account Type</h3>
-                  <p className="text-sm text-gray-600">
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">Account Type</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     {isDemoMode ? 'Demo Account' : 'Firebase Account'}
                   </p>
                 </div>
@@ -321,11 +321,11 @@ export const Settings: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div className="space-y-6">
+            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
               <div>
-                <h3 className="text-sm font-medium text-gray-900">OpenAI Configuration</h3>
-                <p className="text-sm text-gray-600">
+                <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">OpenAI Configuration</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   {isOpenAIConfigured() 
                     ? 'API key is configured and ready to use'
                     : 'API key not configured - using mock responses'}
@@ -341,12 +341,12 @@ export const Settings: React.FC = () => {
             </div>
 
             {!isOpenAIConfigured() && (
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <h4 className="text-sm font-medium text-blue-900 mb-2">How to configure OpenAI:</h4>
-                <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">How to configure OpenAI:</h4>
+                <ol className="text-sm text-blue-800 dark:text-blue-200 space-y-1 list-decimal list-inside">
                   <li>Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="underline">OpenAI Platform</a></li>
-                  <li>Open the <code className="bg-blue-100 px-1 rounded">.env</code> file in your project root</li>
-                  <li>Replace <code className="bg-blue-100 px-1 rounded">sk-your_openai_api_key_here</code> with your actual API key</li>
+                  <li>Open the <code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">.env</code> file in your project root</li>
+                  <li>Replace <code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">sk-your_openai_api_key_here</code> with your actual API key</li>
                   <li>Restart the development server</li>
                 </ol>
               </div>
@@ -380,7 +380,7 @@ export const Settings: React.FC = () => {
               )}
             </div>
 
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
               <p><strong>Available AI Features:</strong></p>
               <ul className="list-disc list-inside mt-2 space-y-1">
                 <li>AI Generate Layout - Create resume/cover letter layouts from prompts</li>

@@ -53,7 +53,7 @@ export const AllProjects: React.FC = () => {
             <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-purple-600 via-pink-600 to-purple-700 mx-auto mb-6 flex items-center justify-center animate-pulse-slow glow-effect">
               <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
             </div>
-            <p className="text-neutral-600 text-lg font-medium">Loading your <span className="gradient-text font-bold">projects</span>...</p>
+            <p className="text-neutral-600 dark:text-neutral-400 text-lg font-medium">Loading your <span className="gradient-text font-bold">projects</span>...</p>
           </div>
         </div>
       </AppLayout>
@@ -71,8 +71,8 @@ export const AllProjects: React.FC = () => {
           className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between"
         >
           <div>
-            <h1 className="text-4xl lg:text-5xl font-black text-neutral-900 mb-3">All Projects</h1>
-            <p className="text-neutral-600 text-lg lg:text-xl font-medium">
+            <h1 className="text-4xl lg:text-5xl font-black text-neutral-900 dark:text-neutral-100 mb-3">All Projects</h1>
+            <p className="text-neutral-600 dark:text-neutral-400 text-lg lg:text-xl font-medium">
               Manage all your <span className="gradient-text font-bold">resumes</span> and <span className="gradient-text font-bold">cover letters</span> in one place
             </p>
           </div>
@@ -93,7 +93,7 @@ export const AllProjects: React.FC = () => {
         >
           <Card className="card-elevated">
             <CardHeader>
-              <CardTitle className="text-2xl font-black text-neutral-900">Search & Filter</CardTitle>
+              <CardTitle className="text-2xl font-black text-neutral-900 dark:text-neutral-100">Search & Filter</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6 lg:space-y-0 lg:flex lg:flex-row lg:items-center lg:gap-6">
@@ -114,7 +114,7 @@ export const AllProjects: React.FC = () => {
                 <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 lg:items-center">
                   {/* Type Filter */}
                   <div className="flex gap-3 items-center min-w-0">
-                    <span className="text-sm lg:text-base font-bold text-neutral-700 whitespace-nowrap">Filter:</span>
+                    <span className="text-sm lg:text-base font-bold text-neutral-700 dark:text-neutral-300 whitespace-nowrap">Filter:</span>
                     <Select
                       value={filterType}
                       onChange={(value) => setFilterType(value as 'all' | 'resume' | 'cover-letter')}
@@ -130,7 +130,7 @@ export const AllProjects: React.FC = () => {
 
                   {/* Sort */}
                   <div className="flex gap-3 items-center min-w-0">
-                    <span className="text-sm lg:text-base font-bold text-neutral-700 whitespace-nowrap">Sort:</span>
+                    <span className="text-sm lg:text-base font-bold text-neutral-700 dark:text-neutral-300 whitespace-nowrap">Sort:</span>
                     <Select
                       value={sortBy}
                       onChange={(value) => {
@@ -159,26 +159,26 @@ export const AllProjects: React.FC = () => {
           transition={{ delay: 0.4, duration: 0.6 }}
         >
           {filteredProjects.length === 0 ? (
-            <Card className="card-elevated border-dashed border-2 border-neutral-300">
+            <Card className="card-elevated border-dashed border-2 border-neutral-300 dark:border-neutral-600">
               <CardContent className="p-16 text-center">
                 {projects.length === 0 ? (
                   <>
-                    <div className="w-20 h-20 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-3xl flex items-center justify-center mx-auto mb-6 floating-element">
-                      <FileText size={32} className="text-neutral-600" />
+                    <div className="w-20 h-20 bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-700 dark:to-neutral-800 rounded-3xl flex items-center justify-center mx-auto mb-6 floating-element">
+                      <FileText size={32} className="text-neutral-600 dark:text-neutral-400" />
                     </div>
-                    <h3 className="text-2xl font-bold text-neutral-900 mb-3">No projects yet</h3>
-                    <p className="text-neutral-600 mb-8 max-w-md mx-auto text-lg">
+                    <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">No projects yet</h3>
+                    <p className="text-neutral-600 dark:text-neutral-400 mb-8 max-w-md mx-auto text-lg">
                       Create your first <span className="gradient-text font-bold">project</span> to get started
                     </p>
                    
                   </>
                 ) : (
                   <>
-                    <div className="w-20 h-20 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-3xl flex items-center justify-center mx-auto mb-6 floating-element">
-                      <Search size={32} className="text-neutral-600" />
+                    <div className="w-20 h-20 bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-700 dark:to-neutral-800 rounded-3xl flex items-center justify-center mx-auto mb-6 floating-element">
+                      <Search size={32} className="text-neutral-600 dark:text-neutral-400" />
                     </div>
-                    <h3 className="text-2xl font-bold text-neutral-900 mb-3">No projects found</h3>
-                    <p className="text-neutral-600 text-lg">
+                    <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">No projects found</h3>
+                    <p className="text-neutral-600 dark:text-neutral-400 text-lg">
                       Try adjusting your <span className="gradient-text font-bold">search</span> or <span className="gradient-text font-bold">filter</span> criteria
                     </p>
                   </>

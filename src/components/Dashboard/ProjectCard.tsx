@@ -70,8 +70,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
             <div className="flex items-center gap-2 lg:gap-3 flex-1 min-w-0">
               <div className={`p-1.5 lg:p-2 rounded-xl flex-shrink-0 ${
                 project.type === 'resume' 
-                  ? 'bg-gradient-to-br from-purple-100 to-pink-100 text-purple-600' 
-                  : 'bg-gradient-to-br from-pink-100 to-purple-100 text-pink-600'
+                  ? 'bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-600 dark:text-purple-400' 
+                  : 'bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 text-pink-600 dark:text-pink-400'
               }`}>
                 {project.type === 'resume' ? 
                   <FileText size={18} className="lg:w-6 lg:h-6" /> : 
@@ -79,10 +79,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 }
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="font-bold text-neutral-900 truncate text-sm lg:text-base">
+                <h3 className="font-bold text-neutral-900 dark:text-neutral-100 truncate text-sm lg:text-base">
                   {project.title}
                 </h3>
-                <p className="text-xs lg:text-sm text-neutral-500 font-medium capitalize">
+                <p className="text-xs lg:text-sm text-neutral-500 dark:text-neutral-400 font-medium capitalize">
                   {project.type.replace('-', ' ')}
                 </p>
               </div>
@@ -93,7 +93,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 onClick={() => setShowRenameModal(true)}
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 lg:h-8 lg:w-8 text-slate-400 hover:text-purple-600 hover:bg-purple-50"
+                className="h-7 w-7 lg:h-8 lg:w-8 text-slate-400 dark:text-slate-500 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30"
                 title="Rename"
               >
                 <Edit2 size={14} className="lg:w-4 lg:h-4" />
@@ -102,7 +102,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 onClick={handleEdit}
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 lg:h-8 lg:w-8 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100"
+                className="h-7 w-7 lg:h-8 lg:w-8 text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 title="Edit"
               >
                 <Edit3 size={14} className="lg:w-4 lg:h-4" />
@@ -111,7 +111,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 onClick={() => setShowDeleteModal(true)}
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 lg:h-8 lg:w-8 text-slate-400 hover:text-red-600 hover:bg-red-50"
+                className="h-7 w-7 lg:h-8 lg:w-8 text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
                 title="Delete"
               >
                 <Trash2 size={14} className="lg:w-4 lg:h-4" />
@@ -119,13 +119,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
             </div>
           </div>
           
-          <div className="flex items-center gap-2 text-xs lg:text-sm text-neutral-500 mb-3 lg:mb-4">
+          <div className="flex items-center gap-2 text-xs lg:text-sm text-neutral-500 dark:text-neutral-400 mb-3 lg:mb-4">
             <Calendar size={14} className="lg:w-4 lg:h-4" />
             <span className="font-medium">Updated {formatDate(project.updatedAt)}</span>
           </div>
           
           <div className="flex items-center justify-between">
-            <span className="text-xs lg:text-sm text-neutral-500 font-medium">
+            <span className="text-xs lg:text-sm text-neutral-500 dark:text-neutral-400 font-medium">
               {project.layout.length} sections
             </span>
             <button
@@ -144,13 +144,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl p-4 lg:p-6 w-full max-w-md relative z-[50000]"
+            className="bg-white dark:bg-neutral-800 rounded-xl p-4 lg:p-6 w-full max-w-md relative z-[50000]"
           >
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
               Rename Project
             </h3>
             <div className="mb-6">
-              <label htmlFor="projectTitle" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="projectTitle" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Project Name
               </label>
               <input
@@ -201,12 +201,12 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl p-4 lg:p-6 w-full max-w-md relative z-[50000]"
+            className="bg-white dark:bg-neutral-800 rounded-xl p-4 lg:p-6 w-full max-w-md relative z-[50000]"
           >
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
               Delete Project
             </h3>
-            <p className="text-slate-600 mb-6">
+            <p className="text-slate-600 dark:text-slate-400 mb-6">
               Are you sure you want to delete "{project.title}"? This action cannot be undone.
             </p>
             <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">

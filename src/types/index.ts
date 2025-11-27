@@ -69,6 +69,14 @@ export interface AIRewriteRequest {
   tone?: 'professional' | 'casual' | 'creative';
 }
 
+export interface AISectionRewriteRequest {
+  title?: string;
+  content: string;
+  sectionType: string;
+  context: string;
+  tone?: 'professional' | 'casual' | 'creative';
+}
+
 export interface FirebaseConfig {
   apiKey: string;
   authDomain: string;

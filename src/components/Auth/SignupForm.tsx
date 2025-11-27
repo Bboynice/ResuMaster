@@ -49,19 +49,19 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
     <div className="w-full max-w-md mx-auto">
       <div className="card p-8">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h2>
-          <p className="text-gray-600">Join ResuMaster and build amazing resumes</p>
+          <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2 transition-colors duration-300">Create Account</h2>
+          <p className="text-neutral-600 dark:text-neutral-400 transition-colors duration-300">Join ResuMaster and build amazing resumes</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-            <p className="text-red-600 text-sm">{error}</p>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4 transition-colors duration-300">
+            <p className="text-red-600 dark:text-red-400 text-sm transition-colors duration-300">{error}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="displayName" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 transition-colors duration-300">
               Full Name
             </label>
             <input
@@ -76,7 +76,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 transition-colors duration-300">
               Email Address
             </label>
             <input
@@ -91,7 +91,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 transition-colors duration-300">
               Password
             </label>
             <div className="relative">
@@ -107,7 +107,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors duration-300"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -115,7 +115,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 transition-colors duration-300">
               Confirm Password
             </label>
             <div className="relative">
@@ -131,7 +131,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors duration-300"
               >
                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -149,9 +149,9 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-gray-600">
+          <p className="text-neutral-600 dark:text-neutral-400 transition-colors duration-300">
             Already have an account?{' '}
-            <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium">
+            <Link to="/login" className="text-neutral-900 dark:text-emerald-400 hover:text-neutral-700 dark:hover:text-emerald-300 font-medium transition-colors duration-300">
               Sign in
             </Link>
           </p>
