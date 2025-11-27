@@ -181,17 +181,5 @@ git commit -m "Add amazing feature"
 git push origin feature/amazing
 ```
 
-Open a PR and describe the change, screenshots, and any new env vars.
-
 ---
 
-## 📄 License & Support
-
-- MIT License – see `LICENSE` for details.
-- Questions? Open an issue or reach me at `your-email@example.com`.
-
-> Crafted with React, Tailwind, Firebase, OpenAI, and a stubborn obsession with great candidate experiences.
-
----
-
-**Happy shipping!** 🚀
